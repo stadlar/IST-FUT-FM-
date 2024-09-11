@@ -167,7 +167,7 @@ paths:
                                       - ExpirationDate: The claim cancellation date
                                       - ClosingDate:  Date when the claim was paid, cancelled or transferred.
                                       - CreationDate: When the claim was created
-                                      - LastChanged: Last claim change event date
+                                      - LastChangeDate: Last claim change event date
         - claimantIdQuery: The claim claimant
         - payorIdQuery: The claim payor
         - statusQuery: Claim has one-of ["Unpaid", "Paid", "Cancelled"] statuses
@@ -600,8 +600,11 @@ paths:
     post:
       summary: Creates a batch. Batch is a list of actions defined in the body
       description: |
-        Creates a list of claims defined by the request body object to be created and/or 
-        alters a list of claims defined by the same object.
+        Accepts on of two request bodies that indicate the action type:
+
+        **batchCreateInitiation** - Initiates a batch with a list of claims to be created.
+
+        **batchAlterInitiation** - Initiates a batch with a list of claims to be altered.
         
         When claim is altered:
           The patch claim method modifies a previously created claim. The patch is
@@ -837,7 +840,7 @@ components:
           - ExpirationDate: The claim cancellation date
           - ClosingDate:  Date when the claim was paid, canceled or transferred.
           - CreationDate: When the claim was created
-          - LastChanged: Last claim change event date
+          - LastChangeDate: Last claim change event date
       type: string
       enum:
         - "DueDate"
@@ -845,7 +848,7 @@ components:
         - "ExpirationDate"
         - "ClosingDate"
         - "CreationDate"
-        - "LastChanged"
+        - "LastChangeDate"
 
     claimStatusSingleResponse:
       description: |
@@ -934,7 +937,7 @@ components:
           $ref: "#/components/schemas/account"
         ownerId:
           $ref: "#/components/schemas/kennitala"
-        type:
+        type:        
           description: |
             Describes what type of additional deposit account this is.
 
@@ -948,7 +951,7 @@ components:
             - "FixedAmount" - A fixed amount is deducted from the amount of the payment and deposited in a disposable account.
             - "Percentage" - Percentage of the amount of the payment deposited in the disposable account.
             - "PrincipalDetail" - Amount of the principal of the payment deposited in a disposable account.
-
+          type: string
           enum:
             - "DefaultInterest"
             - "DefaultCharge"
@@ -994,46 +997,17 @@ components:
         templateCode:
           $ref: "#/components/schemas/templateCode"
         collectionType:
-          type: string
-          enum:
-            - "PrimaryCollection"
-            - "SecondaryCollection"
+          $ref: "#/components/schemas/collectionType"
         category:
           $ref: "#/components/schemas/claimTemplateCategory"
         claimantStatementExtendedReferenceType:
-          description: |
-            Indicates which value appears in the reference area of the creditor's account statement.
-
-            This can be one of the following values:
-              - ReferenceNumber - The first 12 letters of the reference number.
-              - CustomerNumber - The first 12 letters of the transaction number.
-              - ClaimId - Branch number, ledger and claim number.
-              - PayorId - Id (kennitala) of the payor
-              - DueDate - Due date of the claim in the format (yyyymmdd)
-          type: string
-          enum:
-            - ReferenceNumber
-            - CustomerNumber
-            - ClaimId
-            - PayorId
-            - DueDate
+          $ref: "#/components/schemas/claimantStatementExtendedReferenceType"
         customerNumberTemplate:
           description: Describes how the transaction number template is structured for the claim template.
           type: string
           maxLength: 16
         claimantStatementReferenceType:
-          description: |
-            Indicates which value appears in the reference area on the creditor's account statement.
-
-            This can be one of the following values:
-              - DueDate - Due date of the claim in the format (yyyymmdd)
-              - BillNumber - Bill number of the claim
-              - ClaimNumber - Claimnumber (last 6 digits)
-          type: string
-          enum:
-            - DueDate
-            - BillNumber
-            - ClaimNumber
+          $ref: "#/components/schemas/claimantStatementReferenceType"
         depositAccount:
           $ref: "#/components/schemas/depositAccount"
         secondaryCollectionClaimTemplateCode:
@@ -1060,46 +1034,17 @@ components:
         templateCode:
           $ref: "#/components/schemas/templateCode"
         collectionType:
-          type: string
-          enum:
-            - "PrimaryCollection"
-            - "SecondaryCollection"
+          $ref: "#/components/schemas/collectionType"
         category:
           $ref: "#/components/schemas/claimTemplateCategory"
         claimantStatementExtendedReferenceType:
-          description: |
-            Indicates which value appears in the reference area of the creditor's account statement.
-
-            This can be one of the following values:
-              - ReferenceNumber - The first 12 letters of the reference number.
-              - CustomerNumber - The first 12 letters of the transaction number.
-              - ClaimId - Branch number, ledger and claim number.
-              - PayorId - Id (kennitala) of the payor
-              - DueDate - Due date of the claim in the format (yyyymmdd)
-          type: string
-          enum:
-            - ReferenceNumber
-            - CustomerNumber
-            - ClaimId
-            - PayorId
-            - DueDate
+          $ref: "#/components/schemas/claimantStatementExtendedReferenceType"
         customerNumberTemplate:
           description: Describes how the transaction number template is structured for the claim template.
           type: string
           maxLength: 16
         claimantStatementReferenceType:
-          description: |
-            Indicates which value appears in the reference area on the creditor's account statement.
-
-            This can be one of the following values:
-              - DueDate - Due date of the claim in the format (yyyymmdd)
-              - BillNumber - Bill number of the claim
-              - ClaimNumber - Claimnumber (last 6 digits)
-          type: string
-          enum:
-            - DueDate
-            - BillNumber
-            - ClaimNumber
+          $ref: "#/components/schemas/claimantStatementReferenceType"
         depositAccount:
           $ref: "#/components/schemas/depositAccount"
         secondaryCollectionClaimTemplateCode:
@@ -1120,19 +1065,18 @@ components:
     paymentFee:
       description: |
         Additional fee that adds to the claim amount.
-
-        NoticeAndPaymentFee has been renamed from previous standard to PaymentFee
-          - Printing (Payment Fee) (is. Greiðslugjald)
-          - Paperless (Direct Debit Fee) (is. Beingreiðslugjald)
-        Both field accept number with 3 decimal places.
       type: object
       required:
-        - paymentFee
-        - directDebitFee
+        - printingFee
+        - paperlessFee
       properties:
-        paymentFeeAmount:
+        printingFee:
+          description: A fee that is applied if the claim is printed.
           type: number
-        directDebitFee:
+        paperlessFee:
+          description: |
+            A fee that is applied if the claim is paperless.
+            This fee applies to payors who have opted out of receiving printed letters and to direct debit claims.
           type: number
 
     claimKey:
@@ -1153,7 +1097,7 @@ components:
 
     dayAmountItem:
       description: |
-        For whether to use fix amount or calculate by percentage from claimAmount when calculating discount or charge.
+        For whether to use fixed amount or calculate by percentage from claimAmount when calculating discount or charge.
       properties:
         chargeType:
           type: string
@@ -1165,23 +1109,14 @@ components:
           minimum: 0
           maximum: 99
         value:
-          type: integer
+          type: number
 
     discount:
       description: |
         Contains detail information about claim discount
       properties:
-        isPostRefDate:
-          description: |
-            Indicates whether the declared number of days is before or after the reference day. 
-            - True: The number of days is after reference date
-            - False: The number of days is before reference date
-          type: boolean
         referenceDate:
-          type: string
-          enum:
-            - "FinalDueDate"
-            - "DueDate"
+          $ref: "#/components/schemas/referenceDate"
         first:
           $ref: "#/components/schemas/dayAmountItem"
         second:
@@ -1230,9 +1165,7 @@ components:
         printout of the collection claim. Changing a printout to a change entry after printing a note
         does not result in it being reprinted
       type: object
-      properties:
-        claimantAddress:
-          $ref: "#/components/schemas/address"
+      properties:       
         payorAddress:
           $ref: "#/components/schemas/address"
         itemRows:
@@ -1252,12 +1185,7 @@ components:
         In case of defaultCharge charge amount is calculated from claimAmount.
       properties:
         referenceDate:
-          type: string
-          enum:
-            - "FinalDueDate"
-            - "DueDate"
-          description: |
-            Indicates whether to use FinalDueDate or DueDate as refrence for calucation of default charge.
+          $ref: "#/components/schemas/referenceDate"
         first:
           $ref: "#/components/schemas/dayAmountItem"
         second:
@@ -1266,47 +1194,9 @@ components:
     defaultInterest:
       description: |
         Contains information on how penalty interest is calculated.
-          - NoDefaultInterest:
-            No penalty interest shall be required.
-          - DefaultInterestAmount:
-            Indicates that penalty interest is calculated on the basis of the amount claim.
-          - DefaultInterestAmountAndDefaultCharge:
-            Indicates whether penalty interest is calculated on the basis of the amount and arrears of the claim.
-        Percentage: (4 decimal, example: 12.1234 ) 
-        Indicates the percentage of penalty interest, may not be higher than the Central Bank's maximum permitted 
-        penalty interest rate. If the penalty interest rule specifies that penalty interest is to be calculated and 
-        this value is not specified, the Central Bank's maximum penalty interest rate is used automatically.
       properties:
-        dateReference:
-          description: |
-            Calculation reference date. Indicates the date on which penalty interest is calculated. 
-            - DueDate: Due date is the reference date.
-            - FinalDueDate: The deadline is the reference date.
-          type: string
-          enum:
-            - "DueDate"
-            - "FinalDueDate"
-        calculationPeriod:
-          description: |
-            Calculation reference time. 
-            - 24-24: The day is based on the period from 24:00 - 24:00.
-          type: string
-          enum:
-            - "24-24"
-        calculationDayRule:
-          description: |
-            Payment list for a single claim. All payments returned for requested claim id.
-          type: string
-          enum:
-            - "PaymentDay"
-        defaultInterestException:
-          description: |
-            Exemptions from penalty interest if the due date and/or due date does not fall on banking days.
-            - NoException: No exemption. If the due date is on a closed banking day, payment must be made before the 
-                         due date or the last banking day before the due date, depending on the banking day setting.
-          type: string
-          enum:
-            - "NoException"
+        referenceDate:
+          $ref: "#/components/schemas/referenceDate"
         baseAmountType:
           description: |
             Indicates the amount by which the penalty interest is calculated.
@@ -1418,26 +1308,26 @@ components:
         amount:
           description: Claim amount
           type: number
-        defaultChargeAmount:
-          description: Amount of default fees to be paid
+        defaultChargeAmountDue:
+          description: Amount of default charge to be paid
           type: number
-        defaultInterestAmount:
-          description: Amount of accrued penalty interest
+        defaultInterestAmountDue:
+          description: Amount of accrued penalty interests to be paid
           type: number
-        discountAmount:
+        discountAmountOffered:
           description: Discount that will be granted when a collection claim is paid based on status
           type: number
-        noticeChargeAmount:
-          description: Amount of notification fee to be paid.
+        noticeChargeAmountDue:
+          description: Amount of notification charge to be paid.
           type: number
-        otherCostsAmount:
-          description: Current other cost to pay
+        otherCostsAmountDue:
+          description: Current other costs to be paid
           type: number
-        otherDefaultCostsAmount:
-          description: Current other default costs to pay
+        otherDefaultCostsAmountDue:
+          description: Current other default costs to be paid
           type: number
         totalAmountDue:
-          description: Total amount of payment
+          description: Total amount to be paid
           type: number
         reference:
           $ref: "#/components/schemas/reference"
@@ -1458,19 +1348,19 @@ components:
           maxLength: 16
         paymentFee:
           $ref: "#/components/schemas/paymentFee"
-        otherCosts:
+        otherCostsAmount:
           description: Other costs, including determined fees paid by the payer of a collection claim.
-          type: integer
-        otherDefaultCosts:
+          type: number
+        otherDefaultCostsAmount:
           description: Determined fees, e.g. intermediate collection fee.
-          type: integer
+          type: number
         defaultCharge:
           $ref: "#/components/schemas/defaultCharge"
         defaultInterest:
           $ref: "#/components/schemas/defaultInterest"
         discount:
           $ref: "#/components/schemas/discount"
-        isPermitOutOfSequencePayment:
+        isOutOfSequencePaymentAllowed:
           description: Payment rule, is it allowed to pay the last payment if previous has not been paid
           type: boolean
         isPartialPaymentAllowed:
@@ -1483,8 +1373,7 @@ components:
           pattern: '[A-Z]{3}'
         currencyPaymentRate:
           type: string
-          enum:
-            - "DueDateRate"
+          enum:            
             - "PaymentDateRate"
         additionalInformation:
           description: Free text that will be displayed on the claim
@@ -1495,27 +1384,32 @@ components:
         directPaymentClaim:
           description: Is the claim registered as direct payment claim
           type: boolean
-        lastChanged:
+        lastChangeDate:
           description: |
-            This data element might be used to indicate e.g. last time when changed.
+            Last claim change event date.
           type: string
           format: date-time
           example: "2022-12-31T08:05:15Z"
+        createdDate:
+          description: The creation date of the claim.
+          type: string
+          format: date-time
+          example: "2022-12-31T08:05:15Z"
+        claimType:
+          $ref: "#/components/schemas/claimType"
 
-    mergeDetailList:
+    alterClaimDetailsList:
       description: |
-        List of claim to be altered
+        List of claims to be altered
       type: array
       items:
-        $ref: "#/components/schemas/mergeClaimDetails"
+        $ref: "#/components/schemas/alterClaimBatchDetails"
 
     mergeClaimDetails:
       description: |
         Merge patch claim object
       type: object
-      properties:
-        claimKey:
-          $ref: "#/components/schemas/claimKey"
+      properties:       
         expirationDate:
           type: string
           format: date
@@ -1544,19 +1438,19 @@ components:
           maxLength: 16
         paymentFee:
           $ref: "#/components/schemas/paymentFee"
-        otherCosts:
+        otherCostsAmount:
           description: Other costs, including determined fees paid by the payer of a collection claim.
-          type: integer
-        otherDefaultCosts:
+          type: number
+        otherDefaultCostsAmount:
           description: Determined fees, e.g. intermediate collection fee.
-          type: integer
+          type: number
         defaultCharge:
           $ref: "#/components/schemas/defaultCharge"
         defaultInterest:
           $ref: "#/components/schemas/defaultInterest"
         discount:
           $ref: "#/components/schemas/discount"
-        isPermitOutOfSequencePayment:
+        isOutOfSequencePaymentAllowed:
           description: Payment rule, is it allowed to pay the last payment if previous has not been paid
           type: boolean
         isPartialPaymentAllowed:
@@ -1564,12 +1458,7 @@ components:
           type: boolean
         currency:
           type: string
-          pattern: '[A-Z]{3}'
-        currencyPaymentRate:
-          type: string
-          enum:
-            - "DueDateRate"
-            - "PaymentDateRate"
+          pattern: '[A-Z]{3}'        
         additionalInformation:
           description: Free text that will be displayed on the claim
           type: string
@@ -1580,6 +1469,12 @@ components:
           $ref: "#/components/schemas/collectionState"
         printing:
           $ref: "#/components/schemas/printing"
+    
+    alterClaimBatchDetails:
+      allOf: 
+        -  $ref: "#/components/schemas/mergeClaimDetails"
+      required: 
+        -  claimKey
 
 
     createClaimDetailList:
@@ -1600,8 +1495,7 @@ components:
                          the amount must be within the rules that apply according to Regulation 37/2009.
         * defaultInterest: Contains information on how penalty interest is calculated.
         * discount: Contains information about discount as constant or percent
-        * isPermitOutOfSequencePayment: Out of sequence payment allowed
-        * isPartialPaymentAllowed: Partial payment is allowed
+        * isOutOfSequencePaymentAllowed: Out of sequence payment allowed
         * isPartialPaymentAllowed: Partial payment is allowed
       type: object
       required:
@@ -1643,12 +1537,12 @@ components:
           maxLength: 16
         paymentFee:
           $ref: "#/components/schemas/paymentFee"
-        otherCosts:
+        otherCostsAmount:
           description: Other costs, including determined fees paid by the payer of a collection claim.
-          type: integer
-        otherDefaultCosts:
+          type: number
+        otherDefaultCostsAmount:
           description: Determined fees, e.g. intermediate collection fee.
-          type: integer
+          type: number
         # rules
         defaultCharge:
           $ref: "#/components/schemas/defaultCharge"
@@ -1656,38 +1550,106 @@ components:
           $ref: "#/components/schemas/defaultInterest"
         discount:
           $ref: "#/components/schemas/discount"
-        isPermitOutOfSequencePayment:
+        isOutOfSequencePaymentAllowed:
           description: Payment rule, is it allowed to pay the last payment if previous has not been paid
           type: boolean
         isPartialPaymentAllowed:
           type: boolean
         currency:
           type: string
-          pattern: '[A-Z]{3}'
-        currencyPaymentRate:
-          type: string
-          enum:
-            - "DueDateRate"
-            - "PaymentDateRate"
+          pattern: '[A-Z]{3}'      
         additionalInformation:
           description: Free text that will be displayed on the claim
           type: string
           maxLength: 200
         printing:
           $ref: "#/components/schemas/printing"
+        claimType:
+          $ref: "#/components/schemas/claimType"
 
-    batchInitiation:
+    batchCreateInitiation:
       properties:
+        actionType:
+          $ref: "#/components/schemas/actionType"
         createList:
           $ref: "#/components/schemas/createClaimDetailList"
-        mergeList:
-          $ref: "#/components/schemas/mergeDetailList"
+    
+    batchAlterInitiation:
+      properties:
+        actionType:
+          $ref: "#/components/schemas/actionType"
+        alterList:
+          $ref: "#/components/schemas/alterClaimDetailsList"
+    
+    actionType:
+      type: string
+      enum:
+        - "create"
+        - "alter"
+
+    referenceDate:
+      description: |
+        Specifies the reference date for calculations, allowing the choice between the DueDate and the FinalDueDate as the basis.
+      type: string
+      enum:
+        - "DueDate"
+        - "FinalDueDate" 
+
+    claimType:
+      description: |
+        The type of the claim which is to be created.
+          - NormalClaim: A regular claim.
+          - OptionalPaymentClaim: An optional payment claim.
+          - RefundClaim: A refund claim.
+          - BalanceClaim: A government balance claim (only for government entities).
+      type: string
+      enum:
+        - "NormalClaim"
+        - "OptionalPaymentClaim"
+        - "RefundClaim"
+        - "BalanceClaim"
+
+    collectionType:
+      type: string
+      enum:
+        - "PrimaryCollection"
+        - "SecondaryCollection"
+
+    claimantStatementExtendedReferenceType:
+      description: |
+        Indicates which value appears in the reference area of the creditor's account statement.
+        This can be one of the following values:
+        - ReferenceNumber - The first 12 letters of the reference number.
+        - CustomerNumber - The first 12 letters of the transaction number.
+        - ClaimId - Branch number, ledger and claim number.
+        - PayorId - Id (kennitala) of the payor
+        - DueDate - Due date of the claim in the format (yyyymmdd)
+      type: string
+      enum:
+        - ReferenceNumber
+        - CustomerNumber
+        - ClaimId
+        - PayorId
+        - DueDate
+
+    claimantStatementReferenceType:
+      description: |
+        Indicates which value appears in the bill area on the creditor's account statement.
+        This can be one of the following values:
+        - DueDate - Due date of the claim in the format (yyyymmdd)
+        - BillNumber - Bill number of the claim
+        - ClaimNumber - Claimnumber (last 6 digits)
+      type: string
+      enum:
+        - DueDate
+        - BillNumber
+        - ClaimNumber
 
     # RESPONSES
 
-    patchStatus:
+    batchStatus:
       description: | 
-        Status of an batch initiation
+        Status of a batch initiation
       properties:
         batchId:
           $ref: "#/components/schemas/batchId"
@@ -1701,10 +1663,7 @@ components:
           type: integer
           description: Number of items pending processing
         actionType:
-          type: string
-          enum:
-            - "create"
-            - "alter"
+          $ref: "#/components/schemas/actionType"
         actions:
           $ref: "#/components/schemas/claimStatusResponse"
 
@@ -1805,7 +1764,8 @@ components:
           description: |
             Description of the categoryCode
           type: string
-        redeemingBank:
+        transactionBank:
+          description: The bank from which the transaction originates.
           type: string
           format: '[0-9]{4}'
         transactionTimestamp:
@@ -1835,13 +1795,13 @@ components:
             - "Refund"
         depositedAmount:
           description: The amount deposited at the creditor's account.
-          type: integer
-        totalAmount:
-          description: Total amount paid with accrued interest and fees.
-          type: integer
+          type: number
+        totalAmountPaid:
+          description: Total amount paid with accrued interests and fees.
+          type: number
         capitalGainsTax:
           description: Deducted capital gains tax.
-          type: integer
+          type: number
         billNumber:
           description: |
             7 chararacter refrence id set by claimant. This ID will be visible on payers Account statement
@@ -1853,29 +1813,32 @@ components:
             claim with the creditor. Necessary if a direct payment agreement is to be established
           type: string
           maxLength: 16
-        noticeChargeAmount:
-          type: integer
-        defaultChargeAmount:
-          type: integer
-        otherCostsAmount:
-          description: Otherwise cost to pay.
-          type: integer
-        otherDefaultCostsAmount:
-          description: Other default paid.
-          type: integer
-        defaultInterestAmount:
-          description: Amount of accrued penalty interest paid.
-          type: integer
-        discountAmount:
-          description: Discount that was granted when a claim was paid.
-          type: integer
+        noticeChargeAmountPaid:
+          description: Notice charge paid.
+          type: number
+        defaultChargeAmountPaid:
+          description: Default charge paid.
+          type: number
+        otherCostsAmountPaid:
+          description: Other costs paid.
+          type: number
+        otherDefaultCostsAmountPaid:
+          description: Other default costs paid.
+          type: number
+        defaultInterestAmountPaid:
+          description: Amount of accrued penalty interests paid.
+          type: number
+        discountAmountGiven:
+          description: Discount that was granted when the claim was paid.
+          type: number
         currency:
           type: string
           pattern: '[A-Z]{3}'
         currencyExchange:
           $ref: "#/components/schemas/currencyExchangeRate"
-        batchId:
-          $ref: "#/components/schemas/batchId"
+        transactionBatchId:
+          description: The identifier of the batch from which the transaction originates.
+          type: string
 
     #####################################################
     # Standard messages
@@ -2500,12 +2463,19 @@ components:
 
     batchInitiation:
       description: |
-        JSON request body for a list of actions inition request message
+        JSON request body for a list of create or alter actions inition request message
       required: true
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/batchInitiation"
+            discriminator:
+              propertyName: actionType
+              mapping:
+                create: "#/components/schemas/batchCreateInitiation"
+                alter: "#/components/schemas/batchAlterInitiation"
+            oneOf: 
+              - $ref: "#/components/schemas/batchCreateInitiation"
+              - $ref: "#/components/schemas/batchAlterInitiation"
 
     templateCode:
       description: |
@@ -2572,14 +2542,14 @@ components:
     #####################################################
 
     OK_20x_ActionResponse:
-      description: Patch created
+      description: Batch created
       headers:
         X-Request-ID:
           $ref: "#/components/headers/X-Request-ID"
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/patchStatus"
+            $ref: "#/components/schemas/batchStatus"
           examples:
             "Example":
               $ref: "#/components/examples/patchBatch-200_Example"
@@ -2961,73 +2931,62 @@ components:
           "secondaryCollectionClaimTemplateId": "string",
           "categoryCode": "string",
           "amount": 0,
-          "defaultChargeAmount": 0,
-          "defaultInterestAmount": 0,
-          "discountAmount": 0,
-          "noticeChargeAmount": 0,
-          "otherCostsAmount": 0,
-          "otherDefaultCostsAmount": 0,
+          "defaultChargeAmountDue": 0,
+          "defaultInterestAmountDue": 0,
+          "discountAmountOffered": 0,
+          "noticeChargeAmountDue": 0,
+          "otherCostsAmountDue": 0,
+          "otherDefaultCostsAmountDue": 0,
           "totalAmountDue": 0,
           "reference": "string",
           "finalDueDate": "2022-01-31",
           "billNumber": "string",
           "customerNumber": "string",
           "paymentFee": {
-            "paymentFee": 0,
-            "directDebitFee": 0
+            "printingFee": 0,
+            "paperlessFee": 0
           },
-          "otherCosts": 0,
-          "otherDefaultCosts": 0,
+          "otherCostsAmount": 0,
+          "otherDefaultCostsAmount": 0,
           "defaultCharge": {
             "referenceDate": "FinalDueDate",
             "first": {
               "chargeType": "Percentage",
               "day": 0,
-              "amount": 0
+              "value": 0
             },
             "second": {
               "chargeType": "Percentage",
               "day": 0,
-              "amount": 0
+              "value": 0
             }
           },
           "defaultInterest": {
-            "dateReference": "DueDate",
-            "calculationPeriod": "24-24",
-            "calculationDayRule": "PaymentDay",
-            "defaultInterestException": "NoException",
+            "referenceDate": "DueDate",
             "baseAmountType": "Amount",
             "baseTimeType": "Daily",
             "percentage": 0
           },
-          "discount": {
-            "isPostRefDate": true,
+          "discount": {            
             "referenceDate": "FinalDueDate",
             "first": {
               "chargeType": "Percentage",
               "day": 0,
-              "amount": 0
+              "value": 0
             },
             "second": {
               "chargeType": "Percentage",
               "day": 0,
-              "amount": 0
+              "value": 0
             }
           },
-          "isPermitOutOfSequencePayment": true,
+          "isOutOfSequencePaymentAllowed": true,
           "isPartialPaymentAllowed": true,
           "isPartiallyPaid": true,
           "currency": "string",
-          "currencyPaymentRate": "DueDateRate",
+          "currencyPaymentRate": "PaymentDateRate",
           "additionalInformation": "string",
-          "printing": {
-            "claimantAddress": {
-              "name": "string",
-              "addressLine": "string",
-              "postalCode": "string",
-              "city": "string",
-              "country": "string"
-            },
+          "printing": {            
             "payorAddress": {
               "name": "string",
               "addressLine": "string",
@@ -3046,7 +3005,8 @@ components:
             ]
           },
           "directPaymentClaim": true,
-          "lastChanged": "2022-01-31"
+          "lastChangeDate": "2022-01-31",
+          "claimType": "NormalClaim"
         }
 
     getClaimPayments-200_Example:
@@ -3068,28 +3028,28 @@ components:
             "secondaryCollectionClaimTemplateId": "string",
             "reference": "string",
             "categoryCode": "string",
-            "redeemingBank": "string",
+            "transactionBank": "string",
             "transactionTimestamp": "2022-02-24T23:42:20.348Z",
             "bookingDate": "2022-01-31",
             "valueDate": "2022-01-31",
             "paymentType": "Complete",
             "depositedAmount": 0,
-            "totalAmount": 0,
+            "totalAmountPaid": 0,
             "capitalGainsTax": 0,
             "billNumber": "string",
             "customerNumber": "string",
-            "noticeChargeAmount": 0,
-            "defaultChargeAmount": 0,
-            "otherCostsAmount": 0,
-            "otherDefaultCostsAmount": 0,
-            "defaultInterestAmount": 0,
-            "discountAmount": 0,
+            "noticeChargeAmountPaid": 0,
+            "defaultChargeAmountPaid": 0,
+            "otherCostsAmountPaid": 0,
+            "otherDefaultCostsAmountPaid": 0,
+            "defaultInterestAmountPaid": 0,
+            "discountAmountGiven": 0,
             "currency": "string",
             "currencyExchange": {
               "currency": "string",
               "rate": 0
             },
-            "batchId": "stringstringstringstringstringstring"
+            "transactionBatchId": "stringstringstringstringstringstring"
           }
         ]
 
@@ -3115,23 +3075,23 @@ components:
               "secondaryCollectionClaimTemplateId": "string",
               "categoryCode": "string",
               "amount": 0,
-              "defaultChargeAmount": 0,
-              "defaultInterestAmount": 0,
-              "discountAmount": 0,
-              "noticeChargeAmount": 0,
-              "otherCostsAmount": 0,
-              "otherDefaultCostsAmount": 0,
+              "defaultChargeAmountDue": 0,
+              "defaultInterestAmountDue": 0,
+              "discountAmountOffered": 0,
+              "noticeChargeAmountDue": 0,
+              "otherCostsAmountDue": 0,
+              "otherDefaultCostsAmountDue": 0,
               "totalAmountDue": 0,
               "reference": "string",
               "finalDueDate": "2022-01-31",
               "billNumber": "string",
               "customerNumber": "string",
               "paymentFee": {
-                "paymentFee": 0,
-                "directDebitFee": 0
+                "printingFee": 0,
+                "paperlessFee": 0
               },
-              "otherCosts": 0,
-              "otherDefaultCosts": 0,
+              "otherCostsAmount": 0,
+              "otherDefaultCostsAmount": 0,
               "defaultCharge": {
                 "referenceDate": "FinalDueDate",
                 "first": {
@@ -3146,42 +3106,31 @@ components:
                 }
               },
               "defaultInterest": {
-                "dateReference": "DueDate",
-                "calculationPeriod": "24-24",
-                "calculationDayRule": "PaymentDay",
-                "defaultInterestException": "NoException",
+                "referenceDate": "DueDate",
                 "baseAmountType": "Amount",
                 "baseTimeType": "Daily",
                 "percentage": 0
               },
-              "discount": {
-                "isPostRefDate": true,
+              "discount": {                
                 "referenceDate": "FinalDueDate",
                 "first": {
                   "chargeType": "Percentage",
                   "day": 0,
-                  "amount": 0
+                  "value": 0
                 },
                 "second": {
                   "chargeType": "Percentage",
                   "day": 0,
-                  "amount": 0
+                  "value": 0
                 }
               },
-              "isPermitOutOfSequencePayment": true,
+              "isOutOfSequencePaymentAllowed": true,
               "isPartialPaymentAllowed": true,
               "isPartiallyPaid": true,
               "currency": "string",
-              "currencyPaymentRate": "DueDateRate",
+              "currencyPaymentRate": "PaymentDateRate",
               "additionalInformation": "string",
-              "printing": {
-                "claimantAddress": {
-                  "name": "string",
-                  "addressLine": "string",
-                  "postalCode": "string",
-                  "city": "string",
-                  "country": "string"
-                },
+              "printing": {                
                 "payorAddress": {
                   "name": "string",
                   "addressLine": "string",
@@ -3200,7 +3149,7 @@ components:
                 ]
               },
               "directPaymentClaim": true,
-              "lastChanged": "2022-01-31"
+              "lastChangeDate": "2022-01-31"
             },
             "payment": {
               "claimKey": {
@@ -3217,28 +3166,28 @@ components:
               "secondaryCollectionClaimTemplateId": "string",
               "reference": "string",
               "categoryCode": "string",
-              "redeemingBank": "string",
+              "transactionBank": "string",
               "transactionTimestamp": "2022-02-24T23:38:43.220Z",
               "bookingDate": "2022-01-31",
               "valueDate": "2022-01-31",
               "paymentType": "Complete",
               "depositedAmount": 0,
-              "totalAmount": 0,
+              "totalAmountPaid": 0,
               "capitalGainsTax": 0,
               "billNumber": "string",
               "customerNumber": "string",
-              "noticeChargeAmount": 0,
-              "defaultChargeAmount": 0,
-              "otherCostsAmount": 0,
-              "otherDefaultCostsAmount": 0,
-              "defaultInterestAmount": 0,
-              "discountAmount": 0,
+              "noticeChargeAmountPaid": 0,
+              "defaultChargeAmountPaid": 0,
+              "otherCostsAmountPaid": 0,
+              "otherDefaultCostsAmountPaid": 0,
+              "defaultInterestAmountPaid": 0,
+              "discountAmountGiven": 0,
               "currency": "string",
               "currencyExchange": {
                 "currency": "string",
                 "rate": 0
               },
-              "batchId": "stringstringstringstringstringstring"
+              "transactionBatchId": "stringstringstringstringstringstring"
             },
             "transactionDate": "2022-01-31",
             "transactionType": "Creation"
@@ -3266,73 +3215,62 @@ components:
             "secondaryCollectionClaimTemplateId": "string",
             "categoryCode": "string",
             "amount": 0,
-            "defaultChargeAmount": 0,
-            "defaultInterestAmount": 0,
-            "discountAmount": 0,
-            "noticeChargeAmount": 0,
-            "otherCostsAmount": 0,
-            "otherDefaultCostsAmount": 0,
+            "defaultChargeAmountDue": 0,
+            "defaultInterestAmountDue": 0,
+            "discountAmountOffered": 0,
+            "noticeChargeAmountDue": 0,
+            "otherCostsAmountDue": 0,
+            "otherDefaultCostsAmountDue": 0,
             "totalAmountDue": 0,
             "reference": "string",
             "finalDueDate": "2022-01-31",
             "billNumber": "string",
             "customerNumber": "string",
             "paymentFee": {
-              "paymentFee": 0,
-              "directDebitFee": 0
+              "printingFee": 0,
+              "paperlessFee": 0
             },
-            "otherCosts": 0,
-            "otherDefaultCosts": 0,
+            "otherCostsAmount": 0,
+            "otherDefaultCostsAmount": 0,
             "defaultCharge": {
               "referenceDate": "FinalDueDate",
               "first": {
                 "chargeType": "Percentage",
                 "day": 0,
-                "amount": 0
+                "value": 0
               },
               "second": {
                 "chargeType": "Percentage",
                 "day": 0,
-                "amount": 0
+                "value": 0
               }
             },
             "defaultInterest": {
-              "dateReference": "DueDate",
-              "calculationPeriod": "24-24",
-              "calculationDayRule": "PaymentDay",
-              "defaultInterestException": "NoException",
+              "referenceDate": "DueDate",
               "baseAmountType": "Amount",
               "baseTimeType": "Daily",
               "percentage": 0
             },
-            "discount": {
-              "isPostRefDate": true,
+            "discount": {              
               "referenceDate": "FinalDueDate",
               "first": {
                 "chargeType": "Percentage",
                 "day": 0,
-                "amount": 0
+                "value": 0
               },
               "second": {
                 "chargeType": "Percentage",
                 "day": 0,
-                "amount": 0
+                "value": 0
               }
             },
-            "isPermitOutOfSequencePayment": true,
+            "isOutOfSequencePaymentAllowed": true,
             "isPartialPaymentAllowed": true,
             "isPartiallyPaid": true,
             "currency": "string",
-            "currencyPaymentRate": "DueDateRate",
+            "currencyPaymentRate": "PaymentDateRate",
             "additionalInformation": "string",
-            "printing": {
-              "claimantAddress": {
-                "name": "string",
-                "addressLine": "string",
-                "postalCode": "string",
-                "city": "string",
-                "country": "string"
-              },
+            "printing": {             
               "payorAddress": {
                 "name": "string",
                 "addressLine": "string",
@@ -3351,7 +3289,9 @@ components:
               ]
             },
             "directPaymentClaim": true,
-            "lastChanged": "2022-01-31"
+            "lastChangeDate": "2022-01-31",
+            "createdDate": "2022-12-31 08:05:15",
+            "claimType": "NormalClaim"
           }
         ]
 
@@ -3376,19 +3316,19 @@ components:
             "paymentFee": 0,
             "directDebitFee": 0
           },
-          "otherCosts": 0,
-          "otherDefaultCosts": 0,
+          "otherCostsAmount": 0,
+          "otherDefaultCostsAmount": 0,
           "defaultCharge": {
             "referenceDate": "FinalDueDate",
             "first": {
               "chargeType": "Percentage",
               "day": 0,
-              "amount": 0
+              "value": 0
             },
             "second": {
               "chargeType": "Percentage",
               "day": 0,
-              "amount": 0
+              "value": 0
             }
           },
           "defaultInterest": {
@@ -3401,27 +3341,20 @@ components:
             "first": {
               "chargeType": "Percentage",
               "day": 0,
-              "amount": 0
+              "value": 0
             },
             "second": {
               "chargeType": "Percentage",
               "day": 0,
-              "amount": 0
+              "value": 0
             }
           },
-          "isPermitOutOfSequencePayment": true,
+          "isOutOfSequencePaymentAllowed": true,
           "isPartialPaymentAllowed": true,
           "currency": "string",
           "referenceRate": "ExchangeRate",
           "additionalInformation": "string",
-          "printing": {
-            "claimantAddress": {
-              "name": "string",
-              "addressLine": "string",
-              "postalCode": "string",
-              "city": "string",
-              "country": "string"
-            },
+          "printing": {           
             "payorAddress": {
               "name": "string",
               "addressLine": "string",
@@ -3438,7 +3371,8 @@ components:
             "comments": [
               "string"
             ]
-          }
+          },
+          "claimType": "NormalClaim"
         }
 
     patchBatch-200_Example:
