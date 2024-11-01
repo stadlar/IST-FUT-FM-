@@ -60,7 +60,7 @@ paths:
       #query
         - $ref: "#/components/parameters/claimantIdQuery"
         - $ref: "#/components/parameters/bankQuery"
-        - $ref: "#/components/parameters/templateCodeQuery"
+        - $ref: "#/components/parameters/claimTemplateCodeQuery"
         - $ref: "#/components/parameters/isActiveQuery"
         - $ref: "#/components/parameters/page"
         - $ref: "#/components/parameters/itemsPerPage"
@@ -176,7 +176,7 @@ paths:
           - WaitingForSecondary
           - SecondaryCollection
           - LegalCollection
-        - templateCodeQuery: Bank claim template code
+        - claimTemplateCodeQuery: Bank claim template code
         The query function returns a list of claims. The maximum return is set with the page number and 
         number per page.
       operationId: getClaims
@@ -206,7 +206,7 @@ paths:
         - $ref: "#/components/parameters/payorIdQuery"
         - $ref: "#/components/parameters/statusQuery"
         - $ref: "#/components/parameters/stateQuery"
-        - $ref: "#/components/parameters/templateCodeQuery"
+        - $ref: "#/components/parameters/claimTemplateCodeQuery"
         - $ref: "#/components/parameters/claimTemplateIdQuery"
         - $ref: "#/components/parameters/page"
         - $ref: "#/components/parameters/itemsPerPage"
@@ -563,7 +563,7 @@ paths:
         - $ref: "#/components/parameters/claimantId"
         - $ref: "#/components/parameters/dateFromQuery"
         - $ref: "#/components/parameters/dateToQuery"
-        - $ref: "#/components/parameters/templateCodeQuery"
+        - $ref: "#/components/parameters/claimTemplateCodeQuery"
         - $ref: "#/components/parameters/depositAccountQuery"
         - $ref: "#/components/parameters/page"
         - $ref: "#/components/parameters/itemsPerPage"
@@ -801,7 +801,7 @@ components:
       example: "000166123456"
 
 
-    templateCode:
+    claimTemplateCode:
       description: |
         Claim template identifier.
       type: string
@@ -994,8 +994,8 @@ components:
           $ref: "#/components/schemas/claimantId"
         bank:
           $ref: "#/components/schemas/bank"
-        templateCode:
-          $ref: "#/components/schemas/templateCode"
+        claimTemplateCode:
+          $ref: "#/components/schemas/claimTemplateCode"
         collectionType:
           $ref: "#/components/schemas/collectionType"
         category:
@@ -1031,8 +1031,8 @@ components:
           $ref: "#/components/schemas/claimantId"
         bank:
           $ref: "#/components/schemas/bank"
-        templateCode:
-          $ref: "#/components/schemas/templateCode"
+        claimTemplateCode:
+          $ref: "#/components/schemas/claimTemplateCode"
         collectionType:
           $ref: "#/components/schemas/collectionType"
         category:
@@ -1266,7 +1266,7 @@ components:
       required:
         - claimKey
         - payorId
-        - templateCode
+        - claimTemplateCode
         - amount
         - finalDueDate
         - expirationDate
@@ -1288,13 +1288,13 @@ components:
           type: string
           format: date
           example: "2022-01-31"
-        templateCode:
-          $ref: "#/components/schemas/templateCode"
+        claimTemplateCode:
+          $ref: "#/components/schemas/claimTemplateCode"
         claimTemplateId:
           description: Unique Id for each claimTemplate. This is specific to each bank.
           type: string
         secondaryCollectionTemplateCode:
-          $ref: "#/components/schemas/templateCode"
+          $ref: "#/components/schemas/claimTemplateCode"
         secondaryCollectionClaimTemplateId:
           description: Unique Id for each claimTemplate. This is specific to each bank.
           type: string
@@ -1414,8 +1414,8 @@ components:
           type: string
           format: date
           example: "2022-01-31"
-        templateCode:
-          $ref: "#/components/schemas/templateCode"
+        claimTemplateCode:
+          $ref: "#/components/schemas/claimTemplateCode"
         amount:
           description: Claim amount
           type: number
@@ -1501,7 +1501,7 @@ components:
       required:
         - claimKey
         - payorId
-        - templateCode
+        - claimTemplateCode
         - amount
         - finalDueDate
       properties:
@@ -1514,8 +1514,8 @@ components:
           type: string
           format: date
           example: "2022-01-31"
-        templateCode:
-          $ref: "#/components/schemas/templateCode"
+        claimTemplateCode:
+          $ref: "#/components/schemas/claimTemplateCode"
         amount:
           type: number
         reference:
@@ -1744,13 +1744,13 @@ components:
         finalDueDate:
           type: string
           format: date
-        templateCode:
-          $ref: "#/components/schemas/templateCode"
+        claimTemplateCode:
+          $ref: "#/components/schemas/claimTemplateCode"
         claimTemplateId:
           description: Unique Id for each claimTemplate. This is specific to each bank.
           type: string
         secondaryCollectionTemplateCode:
-          $ref: "#/components/schemas/templateCode"
+          $ref: "#/components/schemas/claimTemplateCode"
         secondaryCollectionClaimTemplateId:
           description: Unique Id for each claimTemplate. This is specific to each bank.
           type: string
@@ -1831,9 +1831,6 @@ components:
         discountAmountGiven:
           description: Discount that was granted when the claim was paid.
           type: number
-        currency:
-          type: string
-          pattern: '[A-Z]{3}'
         currencyExchange:
           $ref: "#/components/schemas/currencyExchangeRate"
         transactionBatchId:
@@ -2391,13 +2388,13 @@ components:
       schema:
         $ref: "#/components/schemas/bank"
 
-    templateCodeQuery:
-      name: templateCode
+    claimTemplateCodeQuery:
+      name: claimTemplateCode
       in: query
       description: |
         Claim template code
       schema:
-        $ref: "#/components/schemas/templateCode"
+        $ref: "#/components/schemas/claimTemplateCode"
 
     depositAccountQuery:
       name: depositAccount
@@ -2477,14 +2474,14 @@ components:
               - $ref: "#/components/schemas/batchCreateInitiation"
               - $ref: "#/components/schemas/batchAlterInitiation"
 
-    templateCode:
+    claimTemplateCode:
       description: |
         JSON request body for a claim request message
       required: true
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/templateCode"
+            $ref: "#/components/schemas/claimTemplateCode"
 
     mergeClaim:
       description: |
@@ -2856,7 +2853,7 @@ components:
             "claimTemplateId": "string",
             "claimantId": "string",
             "bank": "0001",
-            "templateCode": "001",
+            "claimTemplateCode": "001",
             "collectionType": "PrimaryCollection",
             "category": {
               "code": "st",
@@ -2881,7 +2878,7 @@ components:
           "claimTemplateId": "string",
           "claimantId": "string",
           "bank": "0001",
-          "templateCode": "001",
+          "claimTemplateCode": "001",
           "collectionType": "PrimaryCollection",
           "category": {
             "code": "st",
@@ -2925,7 +2922,7 @@ components:
           "collectionState": "PrimaryCollection",
           "expirationDate": "2022-01-31",
           "closingDate": "2022-01-31",
-          "templateCode": "001",
+          "claimTemplateCode": "001",
           "claimTemplateId": "string",
           "secondaryCollectionTemplateCode": "001",
           "secondaryCollectionClaimTemplateId": "string",
@@ -3022,7 +3019,7 @@ components:
             "payorId": "0208715009",
             "amount": 0,
             "finalDueDate": "2022-02-24",
-            "templateCode": "001",
+            "claimTemplateCode": "001",
             "claimTemplateId": "string",
             "secondaryCollectionTemplateCode": "001",
             "secondaryCollectionClaimTemplateId": "string",
@@ -3044,7 +3041,6 @@ components:
             "otherDefaultCostsAmountPaid": 0,
             "defaultInterestAmountPaid": 0,
             "discountAmountGiven": 0,
-            "currency": "string",
             "currencyExchange": {
               "currency": "string",
               "rate": 0
@@ -3069,7 +3065,7 @@ components:
               "collectionState": "PrimaryCollection",
               "expirationDate": "2022-01-31",
               "closingDate": "2022-01-31",
-              "templateCode": "001",
+              "claimTemplateCode": "001",
               "claimTemplateId": "string",
               "secondaryCollectionTemplateCode": "001",
               "secondaryCollectionClaimTemplateId": "string",
@@ -3160,7 +3156,7 @@ components:
               "payorId": "0208715009",
               "amount": 0,
               "finalDueDate": "2022-02-24",
-              "templateCode": "001",
+              "claimTemplateCode": "001",
               "claimTemplateId": "string",
               "secondaryCollectionTemplateCode": "001",
               "secondaryCollectionClaimTemplateId": "string",
@@ -3182,7 +3178,6 @@ components:
               "otherDefaultCostsAmountPaid": 0,
               "defaultInterestAmountPaid": 0,
               "discountAmountGiven": 0,
-              "currency": "string",
               "currencyExchange": {
                 "currency": "string",
                 "rate": 0
@@ -3209,7 +3204,7 @@ components:
             "collectionState": "PrimaryCollection",
             "expirationDate": "2022-01-31",
             "closingDate": "2022-01-31",
-            "templateCode": "001",
+            "claimTemplateCode": "001",
             "claimTemplateId": "string",
             "secondaryCollectionTemplateCode": "001",
             "secondaryCollectionClaimTemplateId": "string",
@@ -3306,7 +3301,7 @@ components:
           },
           "payorId": "0208715009",
           "expirationDate": "2022-01-31",
-          "templateCode": "001",
+          "claimTemplateCode": "001",
           "amount": 0,
           "reference": "string",
           "finalDueDate": "2022-01-31",
