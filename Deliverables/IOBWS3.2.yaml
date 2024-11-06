@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: IOBWS 3.0 Payments and accounts
-  version: "3.1"
+  version: "3.2"
   description: |
     # Summary
     This document forms the basis for version 3.2 of the Icelandic Online Banking Services (IOBWS), released as a
@@ -124,7 +124,7 @@ paths:
             - ***cross-border-credit-transfers***
             - ***credit-transfers***
             - ***claim-payments***
-            - ***payment-card-deposits***
+            - ***card-deposits***
 
         Furthermore the request body depends on the **payment-service**:
           * ***payments***: A single payment initiation request.
@@ -5015,6 +5015,13 @@ components:
           format: date
         contractIdentification:
           type: string
+        rateType:
+          type: string
+          enum:
+            - "SPOT"
+            - "SALE"
+            - "AGRD"
+            - "FXTX"
 
 
     paymentExchangeRate:  
@@ -5122,7 +5129,7 @@ components:
           generally as part of a National Account Numbering Scheme(s), 
           which uniquely identifies the account of a customer.
       type: string
-      pattern: "[a-zA-Z0-9]{1,30}" 
+      pattern: '[a-zA-Z0-9\+]{1,30}'
       example: "BARC12345612345678"
 
 
@@ -6764,8 +6771,9 @@ components:
         Payments types:
           * credit-transfers
           * claim-payments
-          * payment-card-deposits
-          * foreign-payment
+          * card-deposits
+          * foreign-payment-sepa
+          * foreign-payment-cross-border
 
       type: object
       required:
@@ -6834,7 +6842,7 @@ components:
 
         Possible values:
           * credit-transfers
-          * payment-card-deposit
+          * card-deposits
 
       type: object
       required:
@@ -6842,6 +6850,9 @@ components:
         - instructedAmount
       properties:
         endToEndIdentification:
+          type: string
+          maxLength: 35
+        instructionIdentification: # N.A. for all, but can be used by ASPSP if needed
           type: string
           maxLength: 35
         debtorId:
@@ -6883,7 +6894,7 @@ components:
         Payments types:
           * credit-transfers
           * claim-payments
-          * payment-card-deposits
+          * card-deposits
 
       type: object
       required:
@@ -6931,7 +6942,7 @@ components:
         
           * credit-transfers
           * claim-payments
-          * payment-card-deposits
+          * card-deposits
           * sepa-credit-transfers
           * cross-border-credit-transfers
         
@@ -7747,6 +7758,9 @@ components:
         endToEndIdentification:
           type: string
           maxLength: 35
+        instructionIdentification: # N.A. for all, but can be used by ASPSP if needed
+          type: string
+          maxLength: 35
         debtorName: # N.A. for all, but can be used by ASPSP if needed
           $ref: "#/components/schemas/debtorName"
         debtorAccount: 
@@ -7804,6 +7818,9 @@ components:
         - frequency
       properties:
         endToEndIdentification:
+          type: string
+          maxLength: 35
+        instructionIdentification: # N.A. for all, but can be used by ASPSP if needed
           type: string
           maxLength: 35
         debtorAccount: 
@@ -11291,7 +11308,7 @@ components:
         The following payment products are supported:
           - credit-transfers
           - claim-payments
-          - payment-card-deposits
+          - card-deposits
           - sepa-credit-transfers
           - cross-border-credit-transfers
         
@@ -11309,7 +11326,7 @@ components:
         enum:
           - "credit-transfers"
           - "claim-payments"
-          - "payment-card-deposits"
+          - "card-deposits"
           - "sepa-credit-transfers"
           - "cross-border-credit-transfers"
 
@@ -11915,7 +11932,7 @@ components:
         There are the following payment-products supported:
           * "credit-transfers with JSON-Body"
           * "claim-payments with JSON-Body"
-          * "payment-card-deposits with JSON-Body"
+          * "card-deposits with JSON-Body"
           * "sepa-credit-transfers" with JSON-Body
           * "cross-border-credit-transfers" with JSON-Body
 
@@ -11949,7 +11966,7 @@ components:
               $ref: "#/components/examples/paymentInitiationDomesticBody_creditTransfer-payments_json"
             "Example 5: 'payments' - 'claim-payments'":
               $ref: "#/components/examples/paymentInitiationDomesticBody_creditTransfer-claim-payments_json"
-            "Example 6: 'payments' - 'payment-card-deposits'":
+            "Example 6: 'payments' - 'card-deposits'":
               $ref: "#/components/examples/paymentInitiationDomesticBody_creditTransfer-payment-card-payments_json"
             "Example 7: 'payments' - 'foreign-payment-sepa'":
               $ref: "#/components/examples/paymentInitiationDomesticBody_creditTransfer-foreign-sepa-payments_json"
@@ -11957,7 +11974,7 @@ components:
               $ref: "#/components/examples/paymentInitiationDomesticBody_creditTransfer-foreign-cross-border-payments_json"            
             "Example 9: 'periodic-payments' - 'credit-transfers'":
               $ref: "#/components/examples/paymentInitiationDomesticBody_creditTransfer-periodic-payments_json"
-            "Example 10: 'periodic-payments' - 'payment-card-deposits'":
+            "Example 10: 'periodic-payments' - 'card-deposits'":
               $ref: "#/components/examples/paymentInitiationDomesticBody_paymentCardTopUp-periodic-payments_json"
             "Example 11: 'bulk-payments' - 'credit-transfers'":
               $ref: "#/components/examples/paymentInitiationDomesticBody_bulk-payments_json"
