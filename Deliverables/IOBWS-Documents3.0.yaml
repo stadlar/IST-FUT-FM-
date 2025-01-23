@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: IOBWS 3.0 Digital Documents
-  version: "3.0"
+  title: IOBWS 3.1 Digital Documents
+  version: "3.1"
   description: |
     # Summary
     
@@ -9,7 +9,7 @@ info:
     and is released as a part of the technical specification ÍST TS 314, digital documents, 
     by the Icelandic Standards Council.
     Previous versions of IOBWS, released in 2007 and 2013 respectively, each used the then most recent OASIS SOAP standards.
-    TS 314 is the immidate successor to TS 165:2013 but offers a more up to date and interoperable set of
+    TS 314 is the immediate successor to TS 165:2013 but offers a more up to date and interoperable set of
     Application Programming Interfaces (APIs).
 
     In places the contract uses elements based on the Berlin Group NextGenPSD2 XS2A Framework, mainly
@@ -203,7 +203,6 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/documentsProcessInitiation"
 
-
       responses:
         '200':
           $ref: "#/components/responses/OK_200_UpdateDocumentsProcess"
@@ -277,7 +276,224 @@ paths:
           $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
         '503':
           $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+          
+          
+  /v1/crossreferences:
 
+    post:
+      summary: Create new cross-references
+      description: Create an array of new cross-references between documents and some other objects (such as claims, credit transfers and payment requests).
+      operationId: createCrossReferences
+      tags:
+        - Cross-Reference Service (CRS)
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        #header
+          #common header parameter
+          - $ref: "#/components/parameters/X-Request-ID"
+          #mandatory header parameter
+          #optional header parameters
+          - $ref: "#/components/parameters/USR-IP-Address_optional"
+          - $ref: "#/components/parameters/Idempotency-Key"
+        #path # NO PATH PARAMETER
+        #query # NO QUERY PARAMETER
+
+      requestBody:
+        $ref: "#/components/requestBodies/createCrossReferences"
+
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_CreateCrossReferences"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+    get:
+      summary: Query cross-references
+      description: |
+        Query cross-references. This method returns an array of cross-references matching the search criteria. 
+
+        Although the search criteria are optional, the key of at least one of the cross-reference relata and its respective data storage or key type must be provided. 
+        That is, either or both the ID of the document (_documentId_) and its data storage (_documentStore_) or the key (_key_) and the type (_keyType_) of the object related to the document in question must be provided. 
+      operationId: queryCrossReferences
+      tags:
+        - Cross-Reference Service (CRS)
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        #header
+          #common header parameter
+          - $ref: "#/components/parameters/X-Request-ID"
+          #mandatory header parameter
+          #optional header parameters
+          - $ref: "#/components/parameters/USR-IP-Address_optional"
+          - $ref: "#/components/parameters/Idempotency-Key"
+        #path # NO PATH PARAMETER
+        #query
+          #mandatory query parameter
+          #optional query parameters
+          - $ref: "#/components/parameters/documentStoreQueryParameter"
+          - $ref: "#/components/parameters/documentId"
+          - $ref: "#/components/parameters/keyType"
+          - $ref: "#/components/parameters/key"
+          - $ref: "#/components/parameters/documentCategory"
+          - $ref: "#/components/parameters/dateFrom"
+          - $ref: "#/components/parameters/dateTo"
+          - $ref: "#/components/parameters/pageOptional"
+          - $ref: "#/components/parameters/itemsPerPageOptional"
+
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_QueryCrossReferences"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+          
+    put:
+      summary: Updates cross-references
+      description:  Updates an array of new cross-references between documents and some other objects (such as claims, credit transfers and payment requests).
+      operationId: updateCrossReferences
+      tags:
+        - Cross-Reference Service (CRS)
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        #header
+          #common header parameter
+          - $ref: "#/components/parameters/X-Request-ID"
+          #mandatory header parameter
+          #optional header parameters
+          - $ref: "#/components/parameters/USR-IP-Address_optional"
+          - $ref: "#/components/parameters/Idempotency-Key"
+        #path # NO PATH PARAMETER
+        #query # NO QUERY PARAMETER
+
+      requestBody:
+        $ref: "#/components/requestBodies/updateCrossReferences"
+
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_UpdateCrossReferences"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+  /v1/crossreferences/{document-store}/{document-id}/{key-type}/{key}:
+
+    delete:
+      summary: Delete a cross-reference
+      description: Delete a cross-reference. 
+      operationId: deleteCrossReference
+      tags:
+        - Cross-Reference Service (CRS)
+      security:
+        - {}
+        - BearerAuthOAuth: []
+      parameters:
+        #header
+          #common header parameter
+          - $ref: "#/components/parameters/X-Request-ID"
+          #mandatory header parameters
+          #optional header parameters
+          - $ref: "#/components/parameters/USR-IP-Address_optional"
+          - $ref: "#/components/parameters/Idempotency-Key"
+        #path
+          #mandatory path parameters
+          - $ref: "#/components/parameters/documentStorePathParameter"
+          - $ref: "#/components/parameters/documentIdPathParameter"
+          - $ref: "#/components/parameters/keyTypePathParameter"
+          - $ref: "#/components/parameters/keyPathParameter"
+          #optional path parameter NO QUERY PARAMETER
+        #query
+          - $ref: "#/components/parameters/externalEventId"
+
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_DeleteCrossReferences"
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+          
 components:
 #####################################################
 # Predefined Components
@@ -361,16 +577,18 @@ components:
     page:
       name: page
       in: query
-      description: OK
+      description: Page number.
       required: true
+      example: 3
       schema:
         type: integer
 
     itemsPerPage:
       name: itemsPerPage
       in: query
-      description: OK
+      description: Number of items per page.
       required: true
+      example: 10
       schema:
         type: integer
 
@@ -379,11 +597,11 @@ components:
       in: query
       description: |
         Conditional: Starting date (inclusive the date dateFrom) of the expected list, mandated if no delta access is required
-        and if bookingStatus does not equal "information.
+        and if bookingStatus does not equal "information".
 
         The relevant date is usually the booking date of the instrument e.g. financial transaction or currency rate value date.
-
       required: false
+      example: "2024-11-29"
       schema:
         type: string
         format: date
@@ -397,8 +615,8 @@ components:
         Might be ignored if a delta function is used.
 
         The relevant date is usually the booking date of the instrument e.g. financial transaction or currency rate value date.
-
       required: false
+      example: "2024-11-30"
       schema:
         type: string
         format: date
@@ -449,6 +667,146 @@ components:
       schema:
         type: string
 
+    keyPathParameter:
+      name: key
+      in: path
+      description: |
+        The key of the object related to the document in question. The key is a unique identifier for the object. The format of the key is determined by the type of the key. 
+        For instance, the key could be a claim key if the object is a claim. 
+      required: true
+      example: "cc15b0b1-eea5-4c65-adc9-b61a83fae528"
+      schema:
+        $ref: "#/components/schemas/key"
+
+    keyTypePathParameter:
+      name: key-type
+      in: path
+      description: |
+        Type of object related to the document in question. The value is one of the following:
+      required: true
+      example: Claim
+      schema:
+        $ref: "#/components/schemas/keyType"
+
+    documentIdPathParameter:
+      name: document-id
+      in: path
+      description: |
+        The ID of document related to the object in question. The ID is a unique identifier for the document in its source system. The format of the key is determined by source system.
+      required: true
+      example: "00ec5225-8a64-48a2-b6bf-f4ef558b27df"
+      schema:
+        $ref: "#/components/schemas/documentId"
+      
+    documentStorePathParameter:
+      name: document-store
+      in: path
+      description: |
+        Document data storage system. The value is one of the following:
+      required: true
+      example: Ark
+      schema:
+        $ref: "#/components/schemas/documentStore"
+
+    key:
+      name: key
+      in: query
+      description: |
+        The key of the object related to the document in question. The key is a unique identifier for the object. The format of the key is determined by the type of the key. 
+        For instance, the key could be a claim key if the object is a claim. 
+      required: false
+      example: "cc15b0b1-eea5-4c65-adc9-b61a83fae528"
+      schema:
+        $ref: "#/components/schemas/key"
+      
+    keyType:
+      name: keyType
+      in: query
+      description: |
+        Type of object related to the document in question. The value is one of the following:
+      required: false
+      example: Claim
+      schema:
+        $ref: "#/components/schemas/keyType"
+
+    documentId:
+      name: documentId
+      in: query
+      description: |
+        The ID of document related to the object in question. The ID is a unique identifier for the document in its source system. The format of the key is determined by source system.
+      required: false
+      example: "00ec5225-8a64-48a2-b6bf-f4ef558b27df"
+      schema:
+        $ref: "#/components/schemas/documentId"
+      
+    documentStoreQueryParameter:
+      name: documentStore
+      in: query
+      description: |
+        Document data storage system. The value is one of the following:
+      required: false
+      example: Ark
+      schema:
+        $ref: "#/components/schemas/documentStore"
+
+    documentCategory:
+      name: documentCategory
+      in: query
+      description: |
+        Document category. The value is one of the following:
+      required: false
+      example: CollectionLetter
+      schema:
+        $ref: "#/components/schemas/documentCategory"
+
+    documentDescription:
+      name: documentDescription
+      in: query
+      description: |
+        A description of the document.
+      required: false
+      example: "Bill for services rendered."
+      schema:
+        $ref: "#/components/schemas/documentDescription"
+
+    documentEffectiveDate:
+      name: documentEffectiveDate
+      in: query
+      description: |
+        The effective date of the document in question. This is the date when the document is considered to be effective.
+      required: false
+      example: "2024-11-29"
+      schema:
+        $ref: "#/components/schemas/documentEffectiveDate"
+      
+    externalEventId:
+      name: ExternalEventId
+      in: query
+      description: |
+        An ID of an event in an external system which yielded the most recent change of the cross-reference. The format of the external event ID is determined by external system which brought the event about.
+      required: false
+      example: "edd45ff6-265e-4cda-8d58-bdefea00acd2"
+      schema:
+        $ref: "#/components/schemas/externalEventId"
+
+    pageOptional:
+      name: page
+      in: query
+      description: Page number. If not specified, the default is 1.
+      required: false
+      example: 3
+      schema:
+        type: integer
+
+    itemsPerPageOptional:
+      name: itemsPerPage
+      in: query
+      description: Number of items per page. If not specified, the default is 10.
+      required: false
+      example: 10
+      schema:
+        type: integer
+
   schemas:
     #####################################################
     # Predefined Schemas
@@ -471,7 +829,7 @@ components:
 
     _linksAll:
       description: |
-        A _link object with all availabel link types.
+        A _link object with all available link types.
       type: object
       additionalProperties:
         $ref: "#/components/schemas/hrefType"
@@ -601,7 +959,7 @@ components:
           $ref: "#/components/schemas/kennitala"
         documentTypeCode:
           description: |
-            Document type code retrived from {sender-kennitala}/types
+            Document type code retrieved from {sender-kennitala}/types
           type: string
         files:
           type: array
@@ -686,7 +1044,7 @@ components:
           $ref: "#/components/schemas/kennitala"
         documentTypeCode:
           description: |
-            Document type code retrived from {sender-kennitala}/types
+            Document type code retrieved from {sender-kennitala}/types
           type: string
         status:
           $ref: "#/components/schemas/processStatus"
@@ -713,6 +1071,114 @@ components:
       pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
       minLength: 36
       maxLength: 36
+
+    crossReferencesList:
+      description: |
+        List of cross-references.
+      type: array
+      items:
+        $ref: "#/components/schemas/crossReference"
+
+    crossReference:
+      description: |
+        Detail information for a single cross-reference.
+      type: object
+      required:
+        - key
+        - keyType
+        - documentId
+        - documentStore
+      properties:
+        key:
+          $ref: "#/components/schemas/key"
+        keyType:
+          $ref: "#/components/schemas/keyType"
+        documentId:
+          $ref: "#/components/schemas/documentId"
+        documentStore:
+          $ref: "#/components/schemas/documentStore"
+        documentCategory:
+          $ref: "#/components/schemas/documentCategory"
+        documentDescription:
+          $ref: "#/components/schemas/documentDescription"
+        documentEffectiveDate:
+          $ref: "#/components/schemas/documentEffectiveDate"
+        externalEventId:
+          $ref: "#/components/schemas/externalEventId"
+
+    key:
+      description: |
+        The key of the object related to the document in question. The key is a unique identifier for the object. The format of the key is determined by the type of the key. 
+        For instance, the key could be a claim key if the object is a claim. 
+      type: string
+      example: "cc15b0b1-eea5-4c65-adc9-b61a83fae528"
+
+    keyType:
+      description: |
+        Type of object related to the document in question. The value is one of the following:
+      type: string
+      enum: #TODO - add more types
+        - "Claim"
+        - "CreditTransfer"
+        - "PaymentRequest"
+
+    documentId:
+      description: |
+        The ID of document related to the object in question. The ID is a unique identifier for the document in its source system. The format of the key is determined by source system.
+      type: string
+      example: "00ec5225-8a64-48a2-b6bf-f4ef558b27df"
+
+    documentStore:
+      description: |
+        Document data storage system. The value is one of the following:
+      type: string
+      enum: 
+        - "Ark"
+        - "RBS"
+
+    documentCategory:
+      description: |
+        Document category. The value is one of the following:
+      type: string
+      enum: 
+        - "AccountStatement"
+        - "PaymentForm"
+        - "Bill"
+        - "CreditCard"
+        - "Payslip"
+        - "Password"
+        - "InterestNote"
+        - "SalarySlip"
+        - "TransactionStatement"
+        - "PaymentNotification"
+        - "Report"
+        - "Receipt"
+        - "Notification"
+        - "TimeSheet"
+        - "CollectionLetter"
+        - "WarningLetter"
+        - "Reminder"
+        - "Other"
+
+    documentDescription:
+      description: |
+        A description of the document.
+      type: string
+      example: "Bill for services rendered."
+
+    documentEffectiveDate:
+      description: |
+        The effective date of the document in question. This is the date when the document is considered to be effective.
+      type: string
+      format: date
+      example: "2024-11-29"
+      
+    externalEventId:
+      description: |
+        An ID of an event in an external system which yielded the most recent change of the cross-reference. The format of the external event ID is determined by external system which brought the event about.
+      type: string
+      example: "edd45ff6-265e-4cda-8d58-bdefea00acd2"
+
 
     #####################################################
     # Standard messages
@@ -1493,7 +1959,7 @@ components:
 
     documentsProcessInitiation:
       description: |
-        JSON request body for a documents process inition or update request message
+        JSON request body for a documents process initiation or update request message
       required: true
       content:
         application/json:
@@ -1502,6 +1968,30 @@ components:
           examples: 
             example:
               $ref: "#/components/examples/documentsProcessInitiation_json_Example"
+
+    createCrossReferences:
+      description: |
+        JSON request body for a cross-references creation request message
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/crossReferencesList"
+          examples: 
+            example:
+              $ref: "#/components/examples/createCrossReferences_json_Example"
+
+    updateCrossReferences:
+      description: |
+        JSON request body for a cross-references update request message
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/crossReferencesList"
+          examples: 
+            example:
+              $ref: "#/components/examples/updateCrossReferences_json_Example"     
 
   headers:
     #####################################################
@@ -1526,7 +2016,7 @@ components:
 
   responses:
     #####################################################
-    # Reusabale Responses
+    # Reusable Responses
     #####################################################
 
     #####################################################
@@ -1584,6 +2074,61 @@ components:
           examples: 
             example:
               $ref: "#/components/examples/documentTypeListResponse-200_json_Example"
+
+    OK_200_CreateCrossReferences:
+      description: |
+        Cross-references created successfully.
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+
+    OK_200_QueryCrossReferences:
+      description: |
+        List of cross-references matching query parameters.
+      headers:
+        X-Paging-CurrentPage:
+          description: |
+            Current page number
+          schema:
+            type: integer
+        X-Paging-TotalPages:
+          description: |
+            Total pages
+          schema:
+            type: integer
+        X-Paging-TotalItems:
+          description: |
+            Total items
+          schema:
+            type: integer
+        X-Paging-PerPage:
+          description: |
+            Items per page
+          schema:
+            type: integer
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/crossReferencesList"
+          examples:
+            "Example":
+              $ref: "#/components/examples/getCrossReferences-200_json_Example"
+
+    OK_200_UpdateCrossReferences:
+      description: |
+        Cross-references updated successfully.
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+
+    OK_200_DeleteCrossReferences:
+      description: |
+        Cross-references deleted successfully.
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
 
     #####################################################
     # Negative Responses
@@ -1883,8 +2428,85 @@ components:
               ]
             }
           ]
-          
         }
+
+    createCrossReferences_json_Example:
+      description: Cross-references creation request.
+      value: 
+        [
+          {
+              "key": "cc15b0b1-eea5-4c65-adc9-b61a83fae528",
+              "keyType": Claim,
+              "documentId": "00ec5225-8a64-48a2-b6bf-f4ef558b27df",
+              "documentStore": Ark,
+              "documentCategory ": Bill,
+              "documentDescription": "Bill for services rendered.",
+              "documentEffectiveDate": "2024-04-01T00:00:00",
+              "externalEventId": "edd45ff6-265e-4cda-8d58-bdefea00acd2"
+          },
+          {
+              "key": "cc15b0b1-eea5-4c65-adc9-b61a83fae528",
+              "keyType": Claim,
+              "documentId": "42fbcce1-35a9-4ec3-8b40-c9a73fc3b8fe",
+              "documentStore": RBS,
+              "documentCategory ": CollectionLetter,
+              "documentDescription": "Collection letter.",
+              "documentEffectiveDate": "2024-05-01T00:00:00",
+              "externalEventId": "e7c58d4e-8cd8-462f-b440-3124f4b6e0bd"
+          }
+        ]
+
+    getCrossReferences-200_json_Example:
+      description: Cross-references query result.
+      value: 
+        [
+          {
+              "key": "cc15b0b1-eea5-4c65-adc9-b61a83fae528",
+              "keyType": Claim,
+              "documentId": "00ec5225-8a64-48a2-b6bf-f4ef558b27df",
+              "documentStore": Ark,
+              "documentCategory ": Bill,
+              "documentDescription": "Bill for services rendered.",
+              "documentEffectiveDate": "2024-04-01T00:00:00",
+              "externalEventId": "edd45ff6-265e-4cda-8d58-bdefea00acd2"
+          },
+          {
+              "key": "cc15b0b1-eea5-4c65-adc9-b61a83fae528",
+              "keyType": Claim,
+              "documentId": "42fbcce1-35a9-4ec3-8b40-c9a73fc3b8fe",
+              "documentStore": RBS,
+              "documentCategory ": CollectionLetter,
+              "documentDescription": "Collection letter.",
+              "documentEffectiveDate": "2024-05-01T00:00:00",
+              "externalEventId": "e7c58d4e-8cd8-462f-b440-3124f4b6e0bd"
+          }
+        ]
+
+    updateCrossReferences_json_Example:
+      description: Cross-references update request.
+      value: 
+        [
+          {
+              "key": "cc15b0b1-eea5-4c65-adc9-b61a83fae528",
+              "keyType": Claim,
+              "documentId": "00ec5225-8a64-48a2-b6bf-f4ef558b27df",
+              "documentStore": Ark,
+              "documentCategory ": Bill,
+              "documentDescription": "Bill for services rendered.",
+              "documentEffectiveDate": "2024-04-01T00:00:00",
+              "externalEventId": "edd45ff6-265e-4cda-8d58-bdefea00acd2"
+          },
+          {
+              "key": "cc15b0b1-eea5-4c65-adc9-b61a83fae528",
+              "keyType": Claim,
+              "documentId": "42fbcce1-35a9-4ec3-8b40-c9a73fc3b8fe",
+              "documentStore": RBS,
+              "documentCategory ": CollectionLetter,
+              "documentDescription": "Collection letter.",
+              "DocumentEffectiveDate": "2024-05-01T00:00:00",
+              "externalEventId": "e7c58d4e-8cd8-462f-b440-3124f4b6e0bd"
+          }
+        ]
 
 security:
   #####################################################
@@ -1903,3 +2525,7 @@ tags:
         * Initiation and update of a document request
         * Status information of a document
         * Document types
+        
+  - name: Cross-Reference Service (CRS)
+    description: |
+      The API interface for Cross-References offer means to create, read, update and delete cross-references between documents and other objects such as claims, credit transfers and payment requests.

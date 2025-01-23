@@ -68,7 +68,7 @@ The intended audience for the specification document ÍST {{spec_id}} is develop
 <!-- ScopePaymentsDocsContextEnd -->
 
 Out of necessity, the previous IOBWS technical specifications largely consisted of expressing the intent and actual content in a human-readable format, otherwise found in the associated XML Schema and SOAP definitions. 
-The expectation for ÍST {{spec_id}} is that the technical service definitions and JSON data schemas in the accompanying OpenAPI specification can be understood using utilities that can convert them into documentation or navigatable user interfaces.
+The expectation for ÍST {{spec_id}} is that the technical service definitions and JSON data schemas in the accompanying OpenAPI specification can be understood using utilities that can convert them into documentation or navigable user interfaces.
 
 <!-- ScopeEndNoteStart -->
 Consequently, the ÍST {{spec_id}} specification avoids the unnecessary repetition of information found in the technical contract "[{{yaml_definition}}](https://github.com/stadlar/IST-FUT-FMTH/blob/master/Deliverables/{{yaml_definition}})". Instead, the document focuses on the information needed to understand the domestic context of services, schema types and service flows required to implement ÍST {{spec_id}}.
@@ -112,6 +112,10 @@ The functionality offered by the service endpoints is described in the [table @t
 Document Service                          The Document Service offers methods to initiate and
                                           update a document, retrieve the status of a document and the types
                                           of documents supported by the system.
+
+Cross-Reference Service                   The Cross-Reference Service offers means to create, read, update and 
+                                          delete cross-references between documents and other objects such as 
+                                          claims, credit transfers and payment requests.
 ---------------------------------------------------------------------------------------------------------------
 :Service on offer. {#tbl:tbl_offered_services}
 
@@ -138,6 +142,21 @@ documents\/{document-store-location}\/{sender-kennitala}\/{documents-id}       G
 {document-store-location}/types                                                Get available document types based on store.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 :Service support in ÍST {{spec_id}} and {{yaml_definition}}. {#tbl:tbl_svcsupport2}  
+
+### Cross-Reference Service 
+
+The [table @tbl:tbl_crossreferences] describes the resources found in the NextGenPSD2 based {{yaml_definition}}.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**Endpoints/Resources**                                                        **Description**
+------------------------------------------------------------------------------ ---------------------------------------------------------------------------------------------------------------
+crossreferences                                                                Create, update or get an array of new cross-references between documents and some other objects
+                                                                               (such as claims, credit transfers and payment requests) corresponding to provided query and body parameters. 
+                                                    
+crossreferences\/{document-store}\/{document-id}\/{key-type}\/{key}            Delete a cross-reference between a document and some other object (such as claims, credit transfers
+                                                                               and payment requests) corresponding to provided path parameters.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+:Service support in ÍST {{spec_id}} and {{yaml_definition}}. {#tbl:tbl_crossreferences}  
 
 # Bibliography {.unnumbered}
 \ 
